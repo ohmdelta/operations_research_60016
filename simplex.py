@@ -1,13 +1,16 @@
 import numpy as np
 
-def simplex(tableu: np.ndarray, zeroIndexed=True) -> np.ndarray:
+def simplex(tableu: np.ndarray, zeroIndexed=True, printIntermediateTableu=False) -> np.ndarray:
+
     z = tableu[0, 1:-1]
     basic = tableu[1:, 0]
 
     cost = tableu[:, -1]
 
     matrix = tableu[1:, 1:-1]
-    # ind = tableu[:, 0]
+    
+    if printIntermediateTableu: print(np.c_[tableu[:,0] + int(zeroIndexed),tableu[:,1:]])
+
     if np.all(z <= 0):
         # overallCost = tableu[0,-1]
         return basic + int(zeroIndexed), cost[1:] , cost[0]
@@ -27,7 +30,7 @@ def simplex(tableu: np.ndarray, zeroIndexed=True) -> np.ndarray:
                 extMatrix[i] -= extMatrix[indOut + 1] * extMatrix[i, indIn]
         
         # cost[1:] -= cost[indOut] * matrix[indOut]
-        return simplex(tableu)
+        return simplex(tableu, zeroIndexed, printIntermediateTableu)
         # tableu
     # pass
 
@@ -41,6 +44,6 @@ if __name__ == "__main__":
         [4,3,4,2,0,1,0,10],
         [5,4,2,1,0,0,1,8]
     ], dtype=np.float128)
-    basic, cost, c = simplex(t)
+    basic, cost, c = simplex(t, printIntermediateTableu=True)
 
     print(basic, cost, c)
