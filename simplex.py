@@ -1,5 +1,20 @@
 import numpy as np
 
+def swapIn(tableu: np.ndarray, indIn: int ,indOut: int):
+
+    basic = tableu[1:,0]        
+    basic[indOut] = indIn
+
+    extMatrix = tableu[:,1:]
+    extMatrix[indOut + 1] /= extMatrix[indOut + 1, indIn]
+
+    for i in range(len(tableu)):
+        if i == indOut + 1:
+            continue
+        else:
+            extMatrix[i] -= extMatrix[indOut + 1] * extMatrix[i, indIn]
+                
+
 def simplex(tableu: np.ndarray, zeroIndexed=True, printIntermediateTableu=False, blandsRule=False) -> np.ndarray:
 
     z = tableu[0, 1:-1]
@@ -18,35 +33,26 @@ def simplex(tableu: np.ndarray, zeroIndexed=True, printIntermediateTableu=False,
         if not blandsRule:
             indIn = np.argmax(z[:-1])
             arr = [(cost[k+1] / i if i > 0 else np.inf) for k, i in enumerate(matrix[:, indIn])]
+            if np.all(np.array(arr) == np.inf):
+                return basic + int(zeroIndexed), cost[1:] , cost[0]
+                
             indOut = np.argmin(arr)
             basic[indOut] = indIn
-            
-            extMatrix = tableu[:,1:]
-            extMatrix[indOut + 1] /= extMatrix[indOut + 1, indIn]
 
-            for i in range(len(tableu)):
-                if i == indOut + 1:
-                    continue
-                else:
-                    extMatrix[i] -= extMatrix[indOut + 1] * extMatrix[i, indIn]
+            swapIn(tableu, indIn, indOut)
             
             return simplex(tableu, zeroIndexed, printIntermediateTableu)
         
         else:
             indIn = np.argmax(z[:-1] > 0)
             arr = [(cost[k+1] / i if i > 0 else np.inf) for k, i in enumerate(matrix[:, indIn])]
-            indOut = np.argmin(arr)
-            basic[indOut] = indIn
-            
-            extMatrix = tableu[:,1:]
-            extMatrix[indOut + 1] /= extMatrix[indOut + 1, indIn]
+            if np.all(np.array(arr) == np.inf):
+                return basic + int(zeroIndexed), cost[1:] , cost[0]
 
-            for i in range(len(tableu)):
-                if i == indOut + 1:
-                    continue
-                else:
-                    extMatrix[i] -= extMatrix[indOut + 1] * extMatrix[i, indIn]
+            indOut = np.argmin(arr)
             
+            swapIn(tableu, indIn, indOut)
+
             return simplex(tableu, zeroIndexed, printIntermediateTableu, blandsRule)
         
 
@@ -75,6 +81,10 @@ if __name__ == "__main__":
         [6, 1, 0, 0, 0, 0, 0, 1, 1,]
     ], dtype=np.float128)
 
-    basic, cost, c = simplex(t, blandsRule=True)
-    print(basic, cost, c)
+    # basic, cost, c = simplex(t, blandsRule=True)
+    # print(basic, cost, c)
 
+    
+
+
+    
