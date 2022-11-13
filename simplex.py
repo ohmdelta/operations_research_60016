@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def swapIn(tableu: np.ndarray, indIn: int ,indOut: int):
 
     basic = tableu[1:,0]        
@@ -31,60 +32,49 @@ def simplex(tableu: np.ndarray, zeroIndexed=True, printIntermediateTableu=False,
         return basic + int(zeroIndexed), cost[1:] , cost[0]
     else:
         if not blandsRule:
-            indIn = np.argmax(z[:-1])
-            arr = [(cost[k+1] / i if i > 0 else np.inf) for k, i in enumerate(matrix[:, indIn])]
-            if np.all(np.array(arr) == np.inf):
-                return basic + int(zeroIndexed), cost[1:] , cost[0]
-                
+            indIn = np.argsort(z[:-1])[::-1]
+            for ind in indIn: 
+                arr = [(cost[k+1] / i if i > 0 else np.inf) for k, i in enumerate(matrix[:, ind])]
+                if z[:-1][ind] <= 0:
+                    return basic + int(zeroIndexed), cost[1:] , cost[0]
+                if np.all(np.array(arr) == np.inf):
+                    continue
+                    # return basic + int(zeroIndexed), cost[1:] , cost[0]
+                else:
+                    break
             indOut = np.argmin(arr)
-            basic[indOut] = indIn
-
+            indIn = ind
+            
             swapIn(tableu, indIn, indOut)
             
             return simplex(tableu, zeroIndexed, printIntermediateTableu)
         
         else:
-            indIn = np.argmax(z[:-1] > 0)
-            arr = [(cost[k+1] / i if i > 0 else np.inf) for k, i in enumerate(matrix[:, indIn])]
-            if np.all(np.array(arr) == np.inf):
-                return basic + int(zeroIndexed), cost[1:] , cost[0]
+            indIn = range(len(z[:-1]))
+            for ind in indIn: 
+                arr = [(cost[k+1] / i if i > 0 else np.inf) for k, i in enumerate(matrix[:, ind])]
+                if z[:-1][ind] <= 0:
+                    continue
+                if np.all(np.array(arr) == np.inf):
+                    continue
+                    # return basic + int(zeroIndexed), cost[1:] , cost[0]
+                else:
+                    break
 
+            if z[:-1][ind] <= 0:
+                return basic + int(zeroIndexed), cost[1:] , cost[0]
+                
             indOut = np.argmin(arr)
-            
+            indIn = ind
             swapIn(tableu, indIn, indOut)
 
             return simplex(tableu, zeroIndexed, printIntermediateTableu, blandsRule)
         
 
-np.set_printoptions(precision=4, suppress=True, linewidth=10000)
+# np.set_printoptions(precision=4, suppress=True, linewidth=10000)
 
 if __name__ == "__main__":
-    t = np.array([
-        [0,6,4,3,0,0,0,0],
-        [3,4,5,3,1,0,0,12],
-        [4,3,4,2,0,1,0,10],
-        [5,4,2,1,0,0,1,8]
-    ], dtype=np.float128)
-    basic, cost, c = simplex(t, printIntermediateTableu=True)
-
-    print(basic, cost, c)
-
-
-    print("\n============================================\n")
-    print("=================blands rule================")
-    print("\n============================================\n")
-
-    t = np.array([
-        [0, 10, -57, -9, -24, 0, 0, 0, 0],
-        [4, 0.5, -5.5, -2.5, 9, 1, 0, 0, 0],
-        [5, 0.5, -1.5, -0.5, 1, 0, 1, 0, 0],
-        [6, 1, 0, 0, 0, 0, 0, 1, 1,]
-    ], dtype=np.float128)
-
-    # basic, cost, c = simplex(t, blandsRule=True)
-    # print(basic, cost, c)
-
-    
+    pass
 
 
     
