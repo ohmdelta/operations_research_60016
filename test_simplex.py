@@ -39,7 +39,25 @@ def test_blands_rule():
     assert (1,1) in z
     assert (3,1) in z
     assert (5,2) in z
+
+def test_two_phase_first_step():
+    t = np.array([
+        [0, 1, 1, 0, 0, 0, -1,  0, 1],
+        [2, 3, 4, 1, 0, 0,  0,  0, 12],
+        [3, 3, 3, 0, 1, 0,  0,  0, 10],
+        [4, 4, 2, 0, 0, 1,  0,  0, 8],
+        [6, 1 ,1, 0, 0, 0, -1,  1, 1]], dtype=np.float128)
     
+    basic, cost, c = simplex(t, blandsRule=True)
+    
+    assert c == 0
+    z = list(zip(basic, cost))
+    assert (3, 9) in z
+    assert (4, 7) in z
+    assert (5, 4) in z
+    assert (1, 1) in z
+
+
 if __name__ == '__main__':
     import sys
     pytest.main(sys.argv)
